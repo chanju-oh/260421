@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자자 리모컨</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { background: #222; color: white; font-family: 'Malgun Gothic', sans-serif; text-align: center; padding: 20px; touch-action: manipulation; }
+        h2 { color: #f0c987; font-size: 1.8em; margin-bottom: 5px; }
+        p { color: #aaa; font-size: 0.95em; line-height: 1.5; margin-bottom: 20px; }
+        
+        .grid-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 500px; margin: 0 auto; }
+        .btn { background: #444; color: white; border: 2px solid #666; padding: 15px 5px; border-radius: 12px; font-size: 1.0em; font-weight: bold; cursor: pointer; word-break: keep-all; transition: 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active:not(:disabled) { background: #f0c987; color: #111; border-color: #d4af37; transform: scale(0.92); }
+        .btn:disabled { background: #222; border-color: #444; color: #666; cursor: not-allowed; }
+        
+        .emoji { font-size: 1.8em; }
+        .count-badge { background: #111; color: #4ade80; padding: 3px 8px; border-radius: 15px; font-size: 0.8em; border: 1px solid #4ade80; margin-top: 5px; }
+        .btn:disabled .count-badge { color: #666; border-color: #666; background: #222; }
+        .info { color: #888; font-size: 0.9em; margin-top: 30px; border-top: 1px dashed #555; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <h2>💸 모의 투자 리모컨</h2>
+    <p>매력적인 요소에 투자하세요! (각 요소당 최대 3번 터치 가능)</p>
+    
+    <div class="grid-3x3">
+        <button class="btn" onclick="addScore(0, this)"><span class="emoji">💡</span>독창적 아이디어<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(1, this)"><span class="emoji">🎨</span>매력적인 디자인<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(2, this)"><span class="emoji">🛍️</span>뛰어난 실용성<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        
+        <button class="btn" onclick="addScore(3, this)"><span class="emoji">🗺️</span>지역 정체성<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(4, this)"><span class="emoji">🎤</span>훌륭한 발표력<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(5, this)"><span class="emoji">🎯</span>정확한 타겟분석<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        
+        <button class="btn" onclick="addScore(6, this)"><span class="emoji">💰</span>합리적인 가격<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(7, this)"><span class="emoji">✨</span>높은 완성도<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+        <button class="btn" onclick="addScore(8, this)"><span class="emoji">🔥</span>무조건 산다!<div class="count-badge"><span class="cnt">0</span> / 3회</div></button>
+    </div>
+    
+    <div class="info">다음 조 발표가 시작되면 화면을 <b>새로고침(F5)</b> 해주세요.</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyALlQNFjwj6YFOHbdSfsNdnAoYje3HpHL4",
+            authDomain: "art-funding.firebaseapp.com",
+            databaseURL: "https://art-funding-default-rtdb.firebaseio.com",
+            projectId: "art-funding",
+            storageBucket: "art-funding.firebasestorage.app",
+            messagingSenderId: "976837369403",
+            appId: "1:976837369403:web:8c71defb3a8919cc82c61e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 9개 버튼의 클릭 횟수를 저장하는 배열 (0으로 초기화)
+        let clickCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        function addScore(index, btnElement) {
+            // 해당 버튼을 누른 횟수가 3회 미만일 때만 작동
+            if(clickCounts[index] < 3) {
+                clickCounts[index]++; // 횟수 1 증가
+                
+                // 파이어베이스에 점수 +1 전송
+                db.ref('currentFunding/score').set(firebase.database.ServerValue.increment(1));
+                
+                // 화면의 숫자 업데이트
+                btnElement.querySelector('.cnt').innerText = clickCounts[index];
+                
+                // 3번 다 누르면 버튼 잠금
+                if(clickCounts[index] >= 3) {
+                    btnElement.disabled = true;
+                }
+                
+                if (navigator.vibrate) navigator.vibrate(40);
+            }
+        }
+    </script>
+</body>
+</html>

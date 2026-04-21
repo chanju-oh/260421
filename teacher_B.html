@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>크라우드펀딩 실시간 현황</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { background: #111; color: #fff; font-family: 'Malgun Gothic', sans-serif; text-align: center; padding-top: 10vh; }
+        .project-title { font-size: 2.5em; color: #f0c987; margin-bottom: 10px; font-weight: bold; }
+        .funding-text { font-size: 8em; font-weight: bold; color: #4ade80; text-shadow: 0 0 20px rgba(74, 222, 128, 0.5); margin: 20px 0; }
+        .progress-bg { width: 80%; height: 60px; background: #333; border-radius: 30px; margin: 0 auto; overflow: hidden; border: 3px solid #555; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #4ade80, #f0c987); transition: width 0.3s ease-out, background 0.3s; }
+        .investors { font-size: 1.5em; color: #aaa; margin-top: 30px; }
+        button { margin-top: 50px; padding: 15px 30px; font-size: 1.2em; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="project-title">🚀 우리 지역 굿즈 크라우드펀딩</div>
+    <div class="investors">달성 목표: <span id="goalDisplay"></span>점 (달성 시 제작 확정!)</div>
+    
+    <div class="funding-text"><span id="percent">0</span>%</div>
+    <div class="progress-bg">
+        <div class="progress-bar" id="bar"></div>
+    </div>
+    
+    <button onclick="resetFunding()">🔄 펀딩 초기화 (다음 조 발표 준비)</button>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyALlQNFjwj6YFOHbdSfsNdnAoYje3HpHL4",
+            authDomain: "art-funding.firebaseapp.com",
+            databaseURL: "https://art-funding-default-rtdb.firebaseio.com",
+            projectId: "art-funding",
+            storageBucket: "art-funding.firebasestorage.app",
+            messagingSenderId: "976837369403",
+            appId: "1:976837369403:web:8c71defb3a8919cc82c61e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 🎯 목표 점수: 반 인원에 맞춰 이 숫자를 수정하세요! (예: 20명이면 200)
+        const goalScore = 100; 
+        document.getElementById('goalDisplay').innerText = goalScore;
+
+        db.ref('currentFunding/score').on('value', (snapshot) => {
+            let score = snapshot.val() || 0;
+            // 100%가 넘어도 그대로 계산
+            let percent = Math.floor((score / goalScore) * 100);
+            
+            // 게이지바는 화면을 뚫고 나갈 수 없으니 최대 폭을 100%로 고정
+            let barWidth = percent > 100 ? 100 : percent; 
+            
+            document.getElementById('percent').innerText = percent;
+            document.getElementById('bar').style.width = barWidth + '%';
+
+            // 100% 돌파 시 불타오르는 효과!
+            if(percent >= 100) {
+                document.getElementById('percent').style.color = '#ff6b6b';
+                document.getElementById('bar').style.background = 'linear-gradient(90deg, #f0c987, #ff6b6b)';
+            } else {
+                document.getElementById('percent').style.color = '#4ade80';
+                document.getElementById('bar').style.background = 'linear-gradient(90deg, #4ade80, #f0c987)';
+            }
+        });
+
+        function resetFunding() {
+            if(confirm("정말 다음 조를 위해 펀딩률을 0%로 초기화할까요?")) {
+                db.ref('currentFunding/score').set(0);
+            }
+        }
+    </script>
+</body>
+</html>
