@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>크라우드펀딩 실시간 현황</title>
+    <title>크라우드펀딩 실시간 현황 (선생님 B)</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
@@ -40,22 +40,19 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 🎯 목표 점수: 반 인원에 맞춰 이 숫자를 수정하세요! (예: 20명이면 200)
-        const goalScore = 100; 
+        // 🚨B선생님 전용 데이터베이스 경로!
+        const DB_PATH = 'funding_B/score'; 
+        const goalScore = 200; 
         document.getElementById('goalDisplay').innerText = goalScore;
 
-        db.ref('currentFunding/score').on('value', (snapshot) => {
+        db.ref(DB_PATH).on('value', (snapshot) => {
             let score = snapshot.val() || 0;
-            // 100%가 넘어도 그대로 계산
             let percent = Math.floor((score / goalScore) * 100);
-            
-            // 게이지바는 화면을 뚫고 나갈 수 없으니 최대 폭을 100%로 고정
             let barWidth = percent > 100 ? 100 : percent; 
             
             document.getElementById('percent').innerText = percent;
             document.getElementById('bar').style.width = barWidth + '%';
 
-            // 100% 돌파 시 불타오르는 효과!
             if(percent >= 100) {
                 document.getElementById('percent').style.color = '#ff6b6b';
                 document.getElementById('bar').style.background = 'linear-gradient(90deg, #f0c987, #ff6b6b)';
@@ -67,7 +64,7 @@
 
         function resetFunding() {
             if(confirm("정말 다음 조를 위해 펀딩률을 0%로 초기화할까요?")) {
-                db.ref('currentFunding/score').set(0);
+                db.ref(DB_PATH).set(0);
             }
         }
     </script>
