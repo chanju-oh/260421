@@ -42,7 +42,7 @@
 
         // 🚨B선생님 전용 데이터베이스 경로!
         const DB_PATH = 'funding_B/score'; 
-        const goalScore = 200; 
+        const goalScore = 100; 
         document.getElementById('goalDisplay').innerText = goalScore;
 
         db.ref(DB_PATH).on('value', (snapshot) => {
